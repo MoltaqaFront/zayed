@@ -107,11 +107,14 @@ export default {
       // Start:: Append Request Data (JSON)
       REQUEST_DATA.append("email", this.loginData.email);
       REQUEST_DATA.append("password", this.loginData.password);
-      REQUEST_DATA.append("fcm_token", this.loginData.device_token);
+      // REQUEST_DATA.append("fcm_token", this.loginData.device_token);
 
       // End:: Append Request Data (JSON)
 
       try {
+
+        await fetch('sanctum/csrf-cookie');
+
         let res = await this.$axios({
           method: "POST",
           url: `auth/login`,
