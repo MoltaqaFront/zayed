@@ -82,23 +82,23 @@
         </template>
         <!-- Start:: No Data State -->
 
-        <template v-slot:[`item.id`]="{ item, index }">
+        <template v-slot:[`item.user.id`]="{ item, index }">
           <div class="table_image_wrapper">
-            <h6 class="text-danger" v-if="!item.id"> {{ $t("TABLES.noData") }} </h6>
+            <h6 class="text-danger" v-if="!item.user.id"> {{ $t("TABLES.noData") }} </h6>
             <p v-else>{{ (paginations.current_page - 1) * paginations.items_per_page + index + 1 }}</p>
           </div>
         </template>
 
         <!-- Start:: Name -->
-        <template v-slot:[`item.name`]="{ item }">
-          <h6 class="text-danger" v-if="!item.name"> {{ $t("TABLES.noData") }} </h6>
-          <h6 v-else> {{ item.name }} </h6>
+        <template v-slot:[`item.user.name`]="{ item }">
+          <h6 class="text-danger" v-if="!item.user.name"> {{ $t("TABLES.noData") }} </h6>
+          <h6 v-else> {{ item.user.name }} </h6>
         </template>
         <!-- End:: Name -->
 
-        <template v-slot:[`item.is_verified`]="{ item }">
-          <v-chip :color="item.is_verified ? 'green' : 'red'" text-color="white" small>
-            <template v-if="item.is_verified">
+        <template v-slot:[`item.user.is_verified`]="{ item }">
+          <v-chip :color="item.user.is_verified ? 'green' : 'red'" text-color="white" small>
+            <template v-if="item.user.is_verified">
               {{ $t("STATUS.active") }}
             </template>
             <template v-else>
@@ -108,14 +108,14 @@
         </template>
 
         <!-- Start:: Activation -->
-        <template v-slot:[`item.is_active`]="{ item }">
+        <template v-slot:[`item.user.is_active`]="{ item }">
           <div class="activation" dir="ltr" style="z-index: 1" v-if="$can('clients activate', 'clients')">
-            <v-switch class="mt-2" color="success" v-model="item.is_active" hide-details
+            <v-switch class="mt-2" color="success" v-model="item.user.is_active" hide-details
               @change="changeActivationStatus(item)"></v-switch>
           </div>
 
           <template v-else>
-            <span class="text-success text-h5" v-if="item.is_active">
+            <span class="text-success text-h5" v-if="item.user.is_active">
               <i class="far fa-check"></i>
             </span>
             <span class="text-danger text-h5" v-else>
@@ -214,44 +214,44 @@ export default {
       tableHeaders: [
         {
           text: this.$t("TABLES.Clients.serialNumber"),
-          value: "id",
+          value: "user.id",
           align: "center",
           width: "80",
           sortable: false,
         },
         {
           text: this.$t("TABLES.Clients.name"),
-          value: "name",
+          value: "user.name",
           align: "center",
           sortable: false,
         },
         {
           text: this.$t("TABLES.Clients.phone"),
-          value: "mobile",
+          value: "user.mobile",
           align: "center",
           sortable: false,
         },
         {
           text: this.$t("TABLES.Clients.email"),
-          value: "email",
+          value: "user.email",
           align: "center",
           sortable: false,
         },
         {
           text: this.$t("TABLES.Clients.joiningDate"),
-          value: "created_at",
+          value: "user.created_at",
           align: "center",
           sortable: false,
         },
         {
           text: this.$t("PLACEHOLDERS.registration_otp_status"),
-          value: "is_verified",
+          value: "user.is_verified",
           align: "center",
           sortable: false,
         },
         {
           text: this.$t("TABLES.Clients.active"),
-          value: "is_active",
+          value: "user.is_active",
           align: "center",
           width: "120",
           sortable: false,
@@ -356,7 +356,7 @@ export default {
       try {
         await this.$axios({
           method: "POST",
-          url: `clients/activate/${item.id}`,
+          url: `clients/activate/${item.user.id}`,
         });
         this.setTableRows();
         this.$message.success(this.$t("MESSAGES.changeActivation"));
@@ -369,7 +369,7 @@ export default {
     // ==================== Start:: Crud ====================
     // ===== Start:: Show
     showItem(item) {
-      this.$router.push({ path: `/clients/show/${item.id}` });
+      this.$router.push({ path: `/clients/show/${item.user.id}` });
     },
     // ===== End:: Show
     // ==================== End:: Crud ====================

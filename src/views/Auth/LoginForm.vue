@@ -122,15 +122,15 @@ export default {
         });
         this.isWaitingRequest = false;
 
-        localStorage.setItem("Zayed_provider_roles", JSON.stringify(res.data.data))
-        console.log("first")
+        console.log("first", res.data.data.user)
+        localStorage.setItem("Zayed_provider_roles", JSON.stringify(res.data.data.user))
 
         console.log(JSON.parse(localStorage.getItem("Zayed_provider_roles")))
         // Start:: Set Authed User Data
         this.setAuthenticatedUserData({
-          id: res.data.data.id,
-          name: res.data.data.name,
-          email: res.data.data.email,
+          id: res.data.data.user.id,
+          name: res.data.data.user.name,
+          email: res.data.data.user.email,
           token: res.data.data.access_token
         });
         // End:: Set Authed User Data

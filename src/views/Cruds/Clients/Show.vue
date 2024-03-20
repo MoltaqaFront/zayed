@@ -159,15 +159,15 @@ export default {
           url: `clients/${this.id}`,
         });
         // console.log("DATA =>", res.data.data);
-        this.data.image = res.data.data.Client.image;
-        this.data.name = res.data.data.Client.name;
-        this.data.phone = res.data.data.Client.mobile;
-        this.data.registration_otp_status = res.data.data.Client.is_verified;
-        this.data.email = res.data.data.Client.email;
-        this.data.joiningDate = res.data.data.Client.created_at;
-        this.data.numberOfVisits = res.data.data.Client.login_count;
-        this.data.lastVisit = res.data.data.Client.last_login;
-        this.data.active = res.data.data.Client.is_active;
+        this.data.image = res.data.data.Client.user.image;
+        this.data.name = res.data.data.Client.user.name;
+        this.data.phone = res.data.data.Client.user.mobile;
+        this.data.registration_otp_status = res.data.data.Client.user.is_verified;
+        this.data.email = res.data.data.Client.user.email;
+        this.data.joiningDate = res.data.data.Client.user.created_at;
+        this.data.numberOfVisits = res.data.data.Client.user.login_count;
+        this.data.lastVisit = res.data.data.Client.user.last_login;
+        this.data.active = res.data.data.Client.user.is_active;
       } catch (error) {
         console.log(error.response.data.message);
       }
