@@ -100,14 +100,16 @@
         </template>
         <!-- End:: Phone -->
 
-        <!-- Start:: Activation -->
+        <!-- Start:: Activation Status -->
         <template v-slot:[`item.is_active`]="{ item }">
-          <div class=" activation" dir="ltr" style="z-index: 1" v-if="$can('categories activate', 'categories')">
-            <v-switch class="mt-2" color="success" v-model="item.is_active" hide-details
-              @change="changeActivationStatus(item)"></v-switch>
-          </div>
+          <span class="text-success text-h5" v-if="item.is_active">
+            <i class="far fa-check"></i>
+          </span>
+          <span class="text-danger text-h5" v-else>
+            <i class="far fa-times"></i>
+          </span>
         </template>
-        <!-- End:: Activation -->
+        <!-- End:: Activation Status -->
 
         <!-- Start:: Actions -->
         <template v-slot:[`item.actions`]="{ item }">
@@ -140,6 +142,24 @@
               </button>
             </a-tooltip>
 
+            <template v-if="$can('categories activate', 'categories') && item.id !== 1">
+              <a-tooltip placement="bottom" v-if="!item.is_active">
+                <template slot="title">
+                  <span>{{ $t("BUTTONS.activate") }}</span>
+                </template>
+                <button class="btn_activate" @click="HandlingItemActivationStatus(item)">
+                  <i class="fad fa-check-circle"></i>
+                </button>
+              </a-tooltip>
+              <a-tooltip placement="bottom" v-if="item.is_active">
+                <template slot="title">
+                  <span>{{ $t("BUTTONS.deactivate") }}</span>
+                </template>
+                <button class="btn_deactivate" @click="selectDeactivateItem(item)">
+                  <i class="fad fa-times-circle"></i>
+                </button>
+              </a-tooltip>
+            </template>
 
             <template v-else>
               <i class="fal fa-lock-alt fs-5 blue-grey--text text--darken-1"></i>
@@ -159,7 +179,11 @@
           <v-dialog v-model="dialogDeactivate">
             <v-card>
               <v-card-title class="text-h5 justify-center" v-if="itemToChangeActivationStatus">
-                {{ $t("TITLES.DeactivateConfirmingMessage", { name: itemToChangeActivationStatus.name }) }}
+                {{
+                    $t("TITLES.DeactivateConfirmingMessage", {
+                      name: itemToChangeActivationStatus.name,
+                    })
+                  }}
               </v-card-title>
 
               <form class="w-100">
@@ -168,7 +192,7 @@
               </form>
 
               <v-card-actions>
-                <v-btn class="modal_confirm_btn" @click="HandlingItemActivationStatus" :disabled="!(!!deactivateReason)">
+                <v-btn class="modal_confirm_btn" @click="HandlingItemActivationStatus" :disabled="!!!deactivateReason">
                   {{ $t("BUTTONS.ok") }}
                 </v-btn>
 
@@ -183,12 +207,15 @@
           <v-dialog v-model="dialogDelete">
             <v-card>
               <v-card-title class="text-h5 justify-center" v-if="itemToDelete">
-                {{ $t("TITLES.DeleteConfirmingMessage", { name: itemToDelete.name }) }}
+                {{ $t("TITLES.DeleteConfirmingMessage", {
+                  name: getAppLocale == 'ar' ? itemToDelete.name_ar :
+                    itemToDelete.name_en
+                }) }}
               </v-card-title>
               <v-card-actions>
                 <v-btn class="modal_confirm_btn" @click="confirmDeleteItem">{{
-                  $t("BUTTONS.ok")
-                }}</v-btn>
+                    $t("BUTTONS.ok")
+                  }}</v-btn>
 
                 <v-btn class="modal_cancel_btn" @click="dialogDelete = false">{{ $t("BUTTONS.cancel") }}</v-btn>
                 <v-spacer></v-spacer>
@@ -410,17 +437,53 @@ export default {
 
     // ===== Start:: Handling Activation & Deactivation
     // Start:: Change Activation Status
-    async changeActivationStatus(item) {
+    selectDeactivateItem(item) {
+      this.dialogDeactivate = true;
+      this.itemToChangeActivationStatus = item;
+    },
+    async HandlingItemActivationStatus(selectedItem) {
+      this.dialogDeactivate = false;
+      let targetItem = this.itemToChangeActivationStatus
+        ? this.itemToChangeActivationStatus
+        : selectedItem;
+      const REQUEST_DATA = new FormData();
+      // Start:: Append Request Data
+      REQUEST_DATA.append("reason", this.deactivateReason);
+      // Start:: Append Request Data
+      // REQUEST_DATA.append("_method", "PUT");
+
       try {
         await this.$axios({
           method: "POST",
           url: `categories/activate/${item.id}`,
+          data: REQUEST_DATA,
         });
         this.$message.success(this.$t("MESSAGES.changeActivation"));
+        let filteredElemet = this.tableRows.find(
+          (element) => element.id === targetItem.id
+        );
+        filteredElemet.is_active = !filteredElemet.is_active;
+
+        this.itemToChangeActivationStatus = null;
+        this.deactivateReason = null;
       } catch (error) {
         this.$message.error(error.response.data.message);
       }
     },
+    // End:: Change Activation Status
+
+    // Start:: Change Activation Status
+    // async changeActivationStatus(item) {
+    //   try {
+    //     await this.$axios({
+    //       method: "POST",
+    //       url: `categories/activate/${item.id}`,
+    //     });
+    //     this.$message.success(this.$t("MESSAGES.changeActivation"));
+    //   } catch (error) {
+    //     this.$message.error(error.response.data.message);
+    //   }
+    // },
     // End:: Change Activation Status
 
     // ==================== Start:: Crud ====================

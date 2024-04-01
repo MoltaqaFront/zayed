@@ -15,8 +15,8 @@
           <!-- End:: Email Input -->
 
           <!-- Start:: Password Input -->
-          <base-input col="7" type="password" :placeholder="$t('PLACEHOLDERS.password')" v-model.trim="loginData.password"
-            required />
+          <base-input col="7" type="password" :placeholder="$t('PLACEHOLDERS.password')"
+            v-model.trim="loginData.password" required />
           <!-- End:: Password Input -->
 
           <!-- Start:: Forget Password Route -->
@@ -122,10 +122,9 @@ export default {
         });
         this.isWaitingRequest = false;
 
-        console.log("first", res.data.data.user)
+        console.log("first", res.data.data)
         localStorage.setItem("Zayed_provider_roles", JSON.stringify(res.data.data.user))
 
-        console.log(JSON.parse(localStorage.getItem("Zayed_provider_roles")))
         // Start:: Set Authed User Data
         this.setAuthenticatedUserData({
           id: res.data.data.user.id,

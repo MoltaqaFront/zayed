@@ -8,7 +8,7 @@ const USER_TOKEN =
 const CURRENT_LANG = store.getters["AppLangModule/getAppLocale"];
 
 // Global headers
-axios.defaults.baseURL = "https://zaydapp.com/dashboard-api/v1/";
+axios.defaults.baseURL = "https://backend.zaydapp.com/dashboard-api/v1/";
 axios.defaults.headers.common["cache-control"] = "no-cache";
 axios.defaults.headers.common["Accept"] = "application/json";
 axios.defaults.headers.common["Api-Version"] = "v1";

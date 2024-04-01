@@ -9,26 +9,20 @@
     <!-- Start:: Single Step Form Content -->
     <div class="single_step_form_content_wrapper">
       <form @submit.prevent="validateFormInputs">
-        <div class="row">
+        <div class="row align-items-center">
 
           <!-- Start:: Receiver Type Input -->
           <base-select-input col="6" :optionsList="receiverTypes" :placeholder="$t('TABLES.Notifications.receiverType')"
-            v-model="data.receiverType" required multiple @input="getMethods" @remove="toggleUnSelectMarket" />
+            v-model="data.receiverType" required @input="getMethods" />
           <!-- End:: Receiver Type Input -->
 
-          <div class="col-6" v-for="(item, index) in data.receiverType" :key="index">
+          <div class="col-6">
 
             <div class="row">
-              <base-select-input v-if="users.length && item.value === 'users'" class="col-12" :optionsList="users"
-                :placeholder="$t('TITLES.users')" v-model="data.users" required multiple />
+              <base-select-input v-if="(data.receiverType && data.receiverType.value === 'clients' && clients.length)"
+                class="col-12" :optionsList="clients" :placeholder="$t('TITLES.clients')" v-model="data.clients" required
+                multiple :focus="false" />
 
-              <base-select-input v-if="stores.length && item.value === 'stores'
-                " class="col-12" :optionsList="stores" :placeholder="$t('TITLES.stores')" v-model="data.stores"
-                required multiple />
-
-              <base-select-input v-if="drivers.length && item.value === 'drivers'
-                " class="col-12" :optionsList="drivers" :placeholder="$t('PLACEHOLDERS.drivers')"
-                v-model="data.drivers" required multiple />
             </div>
 
           </div>
@@ -77,29 +71,18 @@ export default {
   name: "CreateNotification",
 
   computed: {
-    // Start:: Vuex Getters
-    ...mapGetters({
-      allClientsData: "ApiGetsModule/allClientsData",
-      allDriversData: "ApiGetsModule/allDriversData",
-    }),
-    // End:: Vuex Getters
 
     receiverTypes() {
       return [
         {
           id: 1,
-          name: this.$t("TITLES.users"),
-          value: "users",
+          name: this.$t("TITLES.clients"),
+          value: "clients",
         },
         {
-          id: 2,
-          name: this.$t("PLACEHOLDERS.drivers"),
-          value: "drivers",
-        },
-        {
-          id: 3,
-          name: this.$t("TITLES.stores"),
-          value: "stores",
+          id: 5,
+          name: this.$t("STATUS.all"),
+          value: "all",
         },
       ];
     },
@@ -115,16 +98,15 @@ export default {
       // Start:: Data Collection To Send
       data: {
         receiverType: null,
-        users: null,
-        drivers: null,
-        stores: null,
+        clients: null,
+        providers: null,
         titleAr: null,
         titleEn: null,
         contentAr: null,
         contentEn: null,
       },
-      users: [],
-      drivers: [],
+      clients: [],
+      providers: [],
       stores: [],
       // End:: Data Collection To Send
 
@@ -133,45 +115,20 @@ export default {
 
   methods: {
 
-    // Start:: Vuex Actions
-
-    ...mapActions({
-      getClients: "ApiGetsModule/getClients",
-      getDrivers: "ApiGetsModule/getDrivers",
-    }),
-
-    // End:: Vuex Actions
-
     // Start:: validate Form Inputs
     validateFormInputs() {
-      // this.isWaitingRequest = true;
-
-      // if (!this.data.receiverType) {
-      //   this.isWaitingRequest = false;
-      //   this.$message.error(this.$t("VALIDATION.receiverType"));
-      //   return;
-      // } else if (
-      //   this.data.receiverType?.value === "clients" &&
-      //   this.data.clients.length === 0
-      // ) {
-      //   this.isWaitingRequest = false;
-      //   this.$message.error(this.$t("VALIDATION.clientAtLeast"));
-      //   return;
-      // } else if (
-      //   this.data.receiverType?.value === "drivers" &&
-      //   this.data.drivers.length === 0
-      // ) {
-      //   this.isWaitingRequest = false;
-      //   this.$message.error(this.$t("VALIDATION.driverAtLeast"));
-      //   return;
-      // } else if (
-      //   this.data.receiverType?.value === "both" &&
-      //   (this.data.clients.length === 0 || this.data.drivers.length === 0)
-      // ) {
-      //   this.isWaitingRequest = false;
-      //   this.$message.error(this.$t("VALIDATION.clientAndDriver"));
-      //   return;
-      // } 
+      this.isWaitingRequest = true;
+      const arabicRegex = /^[\u0600-\u06FF\s]+$/;
+      if (!arabicRegex.test(this.data.titleAr)) {
+        this.isWaitingRequest = false;
+        this.$message.error(this.$t("VALIDATION.arabic_words_required"));
+        return;
+      }
+      if (!arabicRegex.test(this.data.contentAr)) {
+        this.isWaitingRequest = false;
+        this.$message.error(this.$t("VALIDATION.arabic_words_required"));
+        return;
+      }
       if (!this.data.titleAr) {
         this.isWaitingRequest = false;
         this.$message.error(this.$t("VALIDATION.nameAr"));
@@ -194,24 +151,21 @@ export default {
       }
     },
     // End:: validate Form Inputs
-
     // Start:: Submit Form
     async submitForm() {
       const REQUEST_DATA = new FormData();
       // Start:: Append Request Data
 
-      this.data.receiverType.forEach((receiverType) => {
-        const type = receiverType.value;
-        const selectedItems = this.data[type];
-
-        if (selectedItems) {
-          selectedItems.forEach((element) => {
-            REQUEST_DATA.append(`users[${type}][]`, element.id);
-          });
-        }
-      });
-
-
+      if (this.data.receiverType.value == "all") {
+        REQUEST_DATA.append(`role`, "client");
+        REQUEST_DATA.append(`receiver_type`, "client");
+      }
+      else if (this.data.receiverType.value == "clients") {
+        this.data.clients.forEach((element, index) => {
+          REQUEST_DATA.append(`role`, "client");
+          REQUEST_DATA.append(`users[${index}]`, element.id);
+        });
+      }
       REQUEST_DATA.append("title[ar]", this.data.titleAr);
       REQUEST_DATA.append("title[en]", this.data.titleEn);
       REQUEST_DATA.append("body[ar]", this.data.contentAr);
@@ -221,7 +175,7 @@ export default {
       try {
         await this.$axios({
           method: "POST",
-          url: `admin/send-notification`,
+          url: `notification/store`,
           data: REQUEST_DATA,
         });
         this.isWaitingRequest = false;
@@ -234,45 +188,15 @@ export default {
     },
     // End:: Submit Form
 
-    async getUsers() {
+    async getClients() {
       this.loading = true;
       try {
         let res = await this.$axios({
           method: "GET",
-          url: "admin/get-users",
+          url: "clients"
         });
         this.loading = false;
-        this.users = res.data.body.users;
-      } catch (error) {
-        this.loading = false;
-        console.log(error.response.data.message);
-      }
-    },
-
-    async getDrivers() {
-      this.loading = true;
-      try {
-        let res = await this.$axios({
-          method: "GET",
-          url: "admin/get-drivers",
-        });
-        this.loading = false;
-        this.drivers = res.data.body.drivers;
-      } catch (error) {
-        this.loading = false;
-        console.log(error.response.data.message);
-      }
-    },
-
-    async getStores() {
-      this.loading = true;
-      try {
-        let res = await this.$axios({
-          method: "GET",
-          url: "admin/get-stores"
-        });
-        this.loading = false;
-        this.stores = res.data.body.stores;
+        this.clients = res.data.data;
       } catch (error) {
         this.loading = false;
         console.log(error.response.data.message);
@@ -281,23 +205,11 @@ export default {
 
     getMethods() {
 
+      this.data.clients = null;
 
-      this.data.receiverType.forEach((ele) => {
-
-        if (ele.value === "users") {
-          // this.data.users = [];
-          this.getUsers();
-        } else if (ele.value === "drivers") {
-          // this.data.drivers = [];
-          this.getDrivers();
-        } else if (ele.value === "stores") {
-          // this.data.stores = [];
-          this.getStores();
-        } else {
-          ele.value = null;
-        }
-      })
-
+      if (this.data.receiverType.value === "clients") {
+        this.getClients();
+      }
 
     },
 
@@ -305,9 +217,7 @@ export default {
   },
 
   created() {
-    this.getUsers();
-    this.getDrivers();
-    this.getStores();
+    this.getClients();
   },
 };
 </script>

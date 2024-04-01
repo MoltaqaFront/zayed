@@ -183,7 +183,7 @@ export default {
         {
           id: 2,
           name: this.$t("STATUS.notPublished"),
-          value: "notPublished",
+          value: "unpublished",
         },
         {
           id: 1,
@@ -304,10 +304,8 @@ export default {
     },
     async resetFilter() {
       this.filterOptions.name = null;
-      // this.filterOptions.service_requester_name = null;
-      // this.filterOptions.rate = 0;
-      // this.filterOptions.startDate = null;
-      // this.filterOptions.endDate = null;
+      this.filterOptions.service_requester_name = null;
+      this.filterOptions.rate = 0;
       this.filterOptions.status = null;
       if (this.$route.query.page !== '1') {
         await this.$router.push({ path: '/rates/all', query: { page: 1 } });
@@ -337,7 +335,7 @@ export default {
           url: "rates",
           params: {
             page: this.paginations.current_page,
-            providerName: this.filterOptions.name?.name,
+            name: this.filterOptions.name,
             // rate: this.filterOptions.rate === 0 ? null : this.filterOptions.rate,
             // clientName: this.filterOptions.service_requester_name,
             status: this.filterOptions.status?.value,

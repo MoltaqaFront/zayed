@@ -4,35 +4,35 @@
 
     <div class="statics mt-4">
       <div class="row">
-        <div class="col-lg-4 col-md-6 col-12" v-for="(value, key) in statics" :key="'i' + key">
+        <div class="col-lg-6 col-md-6 col-12" v-for="(value, key) in statics" :key="'i' + key">
           <div class="box">
             <div class="icon">
-              <i v-if="key === 'new'" class="fas fa-newspaper"></i>
+              <i v-if="key === 'users'" class="fas fa-users"></i>
 
-              <i v-else-if="key === 'accepted'" class="fas fa-cart-plus"></i>
-              <i v-else-if="key === 'processing'" class="fas fa-toolbox"></i>
+              <i v-else-if="key === 'total_adv'" class="fas fa-audio-description"></i>
+              <i v-else-if="key === 'avaliable_adv'" class="fas fa-clipboard-check"></i>
 
 
-              <i v-else-if="key === 'completed'" class="fas fa-clipboard-check"></i>
-              <i v-else-if="key === 'cancelled'" class="fas fa-newspaper"></i>
-              <i v-else-if="key === 'rejected'" class="fas fa-ban"></i>
+              <i v-else-if="key === 'booked_adv'" class="fas fa-hourglass-half"></i>
+              <i v-else-if="key === 'sold_adv'" class="fas fa-cart-plus"></i>
+              <i v-else-if="key === 'missed_adv'" class="fas fa-window-close"></i>
 
-              <i v-else-if="key === 'total'" class="fas fa-concierge-bell"></i>
+              <i v-else-if="key === 'profit'" class="fas fa-dollar-sign"></i>
 
             </div>
             <div class="info_box">
-              <span v-if="key == 'new'">{{ $t('PLACEHOLDERS.new_requests_count') }}</span>
+              <span v-if="key == 'users'">{{ $t('SIDENAV.AppContent.users') }}</span>
 
-              <span v-else-if="key === 'accepted'">{{ $t('PLACEHOLDERS.number_of_accepted_orders')
+              <span v-else-if="key === 'total_adv'">{{ $t('SIDENAV.AppContent.total_adv')
               }}</span>
 
-              <span v-else-if="key === 'processing'">{{ $t('PLACEHOLDERS.ongoing_requests_count') }}</span>
+              <span v-else-if="key === 'avaliable_adv'">{{ $t('SIDENAV.AppContent.avaliable_adv') }}</span>
 
-              <span v-else-if="key === 'completed'">{{ $t('PLACEHOLDERS.completed_requests_count') }}</span>
-              <span v-else-if="key === 'cancelled'">{{ $t('PLACEHOLDERS.canceled_requests_count') }}</span>
-              <span v-else-if="key === 'rejected'">{{ $t('PLACEHOLDERS.rejected_requests_count') }}</span>
+              <span v-else-if="key === 'booked_adv'">{{ $t('SIDENAV.AppContent.booked_adv') }}</span>
+              <span v-else-if="key === 'sold_adv'">{{ $t('SIDENAV.AppContent.sold_adv') }}</span>
+              <span v-else-if="key === 'missed_adv'">{{ $t('SIDENAV.AppContent.missed_adv') }}</span>
 
-              <span v-else-if="key === 'total'">{{ $t('PLACEHOLDERS.total_requests') }}</span>
+              <span v-else-if="key === 'profit'">{{ $t('SIDENAV.AppContent.profit') }}</span>
 
               <p class="number_box">{{ value }}</p>
             </div>
@@ -65,7 +65,7 @@ export default {
       try {
         let res = await this.$axios({
           method: "GET",
-          url: "home-statistics"
+          url: "setting/general-statistic"
         });
 
         // console.log("All Data ==>", res.data.data);
@@ -96,9 +96,10 @@ export default {
   overflow-y: auto;
   overflow-x: hidden;
 
+ 
   .statics {
     .box {
-      background: aliceblue;
+      background: #B32BCB;
       padding: 25px;
       margin-bottom: 10px;
       border-radius: 5px;
@@ -112,6 +113,19 @@ export default {
       &:hover {
         background: #fff;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+        .icon {
+          i{
+            color: #B32BCB;
+          }
+        }
+        .info_box {
+
+          span,
+          p.number_box {
+            color: #000
+          }
+        }
       }
 
       .icon {
@@ -119,13 +133,14 @@ export default {
         min-width: 60px;
         width: 60px;
         border-radius: 60px;
-        background: rgba(0, 123, 255, 0.2);
+        background: #FFF;
         display: flex;
         align-items: center;
         justify-content: center;
 
         i {
-          font-size: 25px
+          font-size: 25px ;
+          color: #000;
         }
       }
 
@@ -137,16 +152,17 @@ export default {
 
         span {
           font-size: 19px;
-          color: #6c757d;
+          color: #FFF;
         }
 
         p.number_box {
           font-size: 30px;
-          color: #000;
+          color: #FFF;
           font-weight: bold;
         }
       }
     }
   }
+
 }
 </style>

@@ -120,9 +120,14 @@ import ShowAdmin from "../views/Cruds/Admins/Show.vue";
 // ============== Start:: All Notifications Routes
 import NotificationsHome from "../views/Cruds/Notifications/Home.vue";
 import AllNotifications from "../views/Cruds/Notifications/ShowAll.vue";
+import ShowNotification from "../views/Cruds/Notifications/Show.vue";
 import CreateNotifications from "../views/Cruds/Notifications/Create.vue";
 // ============== End:: All Notifications Routes
 
+// ============== Start:: Advertisements Routes
+import AdvertisementsHome from "../views/Cruds/Advertisments/Home.vue";
+import AllAdvertisements from "../views/Cruds/Advertisments/ShowAll.vue";
+import ShowAdvertisements from "../views/Cruds/Advertisments/Show.vue";
 // ============== Start:: Forbidden Route
 import ForbiddenPage from "../pages/ForbiddenPage.vue";
 // ============== End:: Forbidden Route
@@ -212,7 +217,7 @@ const routes = [
             meta: {
               middleware: [auth],
               requiresPermission: {
-                action: "clients index",
+                action: "clients show",
                 subject: "clients",
               },
             },
@@ -220,6 +225,44 @@ const routes = [
         ],
       },
       // End:: Clients Routes Config
+
+      // Start:: Advertisments Routes Config
+      {
+        path: "/Advertisements",
+        name: "AdvertisementsHome",
+        component: AdvertisementsHome,
+        meta: {
+          middleware: [auth],
+        },
+        children: [
+          {
+            path: "all",
+            name: "AllAdvertisements",
+            component: AllAdvertisements,
+            meta: {
+              middleware: [auth],
+              requiresPermission: {
+                action: "advertisements index",
+                subject: "advertisements",
+              },
+            },
+          },
+          {
+            path: "show/:id",
+            name: "ShowAdvertisements",
+            component: ShowAdvertisements,
+            props: true,
+            meta: {
+              middleware: [auth],
+              requiresPermission: {
+                action: "advertisements show",
+                subject: "advertisements",
+              },
+            },
+          },
+        ],
+      },
+      // End:: Advertisments Routes Config
 
       // Start:: Category  Config
       {
@@ -955,7 +998,7 @@ const routes = [
         children: [
           {
             path: "all",
-            name: "AllAdmins",
+            name: "AllNotifications",
             component: AllNotifications,
             meta: {
               middleware: [auth],
@@ -963,12 +1006,24 @@ const routes = [
           },
           {
             path: "create",
-            name: "CreateNotificationss",
+            name: "CreateNotifications",
             component: CreateNotifications,
             meta: {
               middleware: [auth],
               requiresPermission: {
-                action: "todo create",
+                action: "notifications create",
+                subject: "notifications",
+              },
+            },
+          },
+          {
+            path: "show",
+            name: "ShowNotification",
+            component: ShowNotification,
+            meta: {
+              middleware: [auth],
+              requiresPermission: {
+                action: "notifications index",
                 subject: "notifications",
               },
             },

@@ -75,12 +75,12 @@
         <!-- Start:: No Data State -->
 
         <!-- Start:: Item Image -->
-        <template v-slot:[`item.user.image`]="{ item }">
+        <template v-slot:[`item.image`]="{ item }">
           <div class="table_image_wrapper">
-            <h6 class="text-danger" v-if="!item.user.image"> {{ $t("TABLES.noData") }} </h6>
+            <h6 class="text-danger" v-if="!item.image"> {{ $t("TABLES.noData") }} </h6>
 
-            <button class="my-1" @click="showImageModal(item.user.image)" v-else>
-              <img class="rounded" :src="item.user.image" :alt="item.user.name" width="60" height="60" />
+            <button class="my-1" @click="showImageModal(item.image)" v-else>
+              <img class="rounded" :src="item.image" :alt="item.name" width="60" height="60" />
             </button>
           </div>
         </template>
@@ -110,8 +110,8 @@
         <!-- End:: Phone -->
 
         <!-- Start:: Activation Status -->
-        <template v-slot:[`item.user.is_active`]="{ item }">
-          <span class="text-success text-h5" v-if="item.user.is_active">
+        <template v-slot:[`item.is_active`]="{ item }">
+          <span class="text-success text-h5" v-if="item.is_active">
             <i class="far fa-check"></i>
           </span>
           <span class="text-danger text-h5" v-else>
@@ -152,7 +152,7 @@
             </a-tooltip>
 
             <template v-if="$can('users activate', 'users') && item.id !== 1">
-              <a-tooltip placement="bottom" v-if="!item.user.is_active">
+              <a-tooltip placement="bottom" v-if="!item.is_active">
                 <template slot="title">
                   <span>{{ $t("BUTTONS.activate") }}</span>
                 </template>
@@ -160,7 +160,7 @@
                   <i class="fad fa-check-circle"></i>
                 </button>
               </a-tooltip>
-              <a-tooltip placement="bottom" v-if="item.user.is_active">
+              <a-tooltip placement="bottom" v-if="item.is_active">
                 <template slot="title">
                   <span>{{ $t("BUTTONS.deactivate") }}</span>
                 </template>
@@ -188,7 +188,7 @@
           <v-dialog v-model="dialogDeactivate">
             <v-card>
               <v-card-title class="text-h5 justify-center" v-if="itemToChangeActivationStatus">
-                {{ $t("TITLES.DeactivateConfirmingMessage", { name: itemToChangeActivationStatus.user.name }) }}
+                {{ $t("TITLES.DeactivateConfirmingMessage", { name: itemToChangeActivationStatus.name }) }}
               </v-card-title>
 
               <form class="w-100">
@@ -212,7 +212,7 @@
           <v-dialog v-model="dialogDelete">
             <v-card>
               <v-card-title class="text-h5 justify-center" v-if="itemToDelete">
-                {{ $t("TITLES.DeleteConfirmingMessage", { name: itemToDelete.user.name }) }}
+                {{ $t("TITLES.DeleteConfirmingMessage", { name: itemToDelete.name }) }}
               </v-card-title>
               <v-card-actions>
                 <v-btn class="modal_confirm_btn" @click="confirmDeleteItem">{{
@@ -267,12 +267,7 @@ export default {
           id: 2,
           name: this.$t("STATUS.notActive"),
           value: 0,
-        },
-        {
-          id: null,
-          name: this.$t("STATUS.all"),
-          value: null,
-        },
+        }
       ];
     },
   },
@@ -299,44 +294,44 @@ export default {
       tableHeaders: [
         {
           text: this.$t("TABLES.Admins.serialNumber"),
-          value: "user.id",
+          value: "id",
           align: "center",
           width: "80",
           sortable: false,
         },
         {
           text: this.$t("TABLES.Admins.image"),
-          value: "user.image",
+          value: "image",
           align: "center",
           sortable: false,
         },
         {
           text: this.$t("TABLES.Admins.name"),
-          value: "user.name",
+          value: "name",
           align: "center",
           sortable: false,
         },
         {
           text: this.$t("TABLES.Admins.phone"),
-          value: "user.mobile",
+          value: "mobile",
           align: "center",
           sortable: false,
         },
         {
           text: this.$t("TABLES.Admins.email"),
-          value: "user.email",
+          value: "email",
           align: "center",
           sortable: false,
         },
         {
           text: this.$t("TABLES.Admins.joiningDate"),
-          value: "user.created_at",
+          value: "created_at",
           align: "center",
           sortable: false,
         },
         {
           text: this.$t("PLACEHOLDERS.status"),
-          value: "user.is_active",
+          value: "is_active",
           align: "center",
           width: "120",
           sortable: false,
@@ -467,7 +462,7 @@ export default {
       try {
         await this.$axios({
           method: "POST",
-          url: `admins/activate/${targetItem.user.id}`,
+          url: `admins/activate/${targetItem.id}`,
           data: targetItem.is_active ? REQUEST_DATA : null,
         });
         this.$message.success(this.$t("MESSAGES.changeActivation"));
@@ -483,10 +478,10 @@ export default {
     // ==================== Start:: Crud ====================
     // ===== Start:: End
     editItem(item) {
-      this.$router.push({ path: `/admins/edit/${item.user.id}` });
+      this.$router.push({ path: `/admins/edit/${item.id}` });
     },
     showItem(item) {
-      this.$router.push({ path: `/admins/show/${item.user.id}` });
+      this.$router.push({ path: `/admins/show/${item.id}` });
     },
     // ===== End:: End
 
@@ -499,7 +494,7 @@ export default {
       try {
         await this.$axios({
           method: "DELETE",
-          url: `admins/${this.itemToDelete.user.id}`,
+          url: `admins/${this.itemToDelete.id}`,
         });
         this.dialogDelete = false;
         this.tableRows = this.tableRows.filter((item) => {

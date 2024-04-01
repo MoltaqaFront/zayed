@@ -18,6 +18,23 @@
 
 
             <div class="group">
+
+              <!-- ********** Start:: Notification Button ********** -->
+                <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <button v-bind="attrs" v-on="on">
+                    <v-badge :content="notificationsData.unreadNotifications" floating>
+                    <div class="notification_btn" @click.stop="
+                      toggleNotificationsMenu();">
+                      <i class=" fal fa-bell"></i>
+                    </div>
+                  </v-badge>
+                  </button>
+                </template>
+                <span class="toolTip">{{ $t("TOOLTIPS.notifications") }}</span>
+              </v-tooltip>
+              <!-- ********** End:: Notification Button ********** -->
+
               <!-- ********** Start:: Theme Switcher Button ********** -->
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
@@ -56,92 +73,6 @@
               </div>
               <!-- ********** End:: Language Switcher Button ********** -->
 
-              <!-- ********** Start:: Notification Button ********** -->
-              <div class="user_notification_content_wrapper">
-                <router-link to="/all-notifications/all">
-                  <a-badge :count="notificationsData.unreadNotifications" :overflow-count="9">
-                    <button aria-label="notification_btn" class="notification_btn">
-                      <i class="fal fa-bell"></i>
-                    </button>
-                  </a-badge>
-                </router-link>
-
-                <!-- <a-badge :count="notificationsData.unreadNotifications" :overflow-count="9" >
-                  <button aria-label="notification_btn" class="notification_btn" @click.stop="
-                    toggleNotificationsMenu();
-                  getNotifications();
-                  ">
-                    <i class="fal fa-bell"></i>
-                  </button>
-                </a-badge> -->
-
-                <transition name="fadeInUp">
-                  <!-- START:: NOTIFICATIONS LIST -->
-                  <div class="notifications_menu_wrapper" v-if="notificationsMenuIsOpen">
-                    <!-- ========== START:: NOTIFICATION HEADER ========== -->
-                    <div class="notifications_menu_header">
-                      <h5>
-                        {{ $t("TITLES.notifications") }}
-                      </h5>
-                      <h3>
-                        {{ notificationsData.unreadNotifications }}
-                        {{ $t("TITLES.new") }}
-                      </h3>
-                    </div>
-                    <!-- ========== END:: NOTIFICATION HEADER ========== -->
-
-                    <!-- START:: EMPTY NOTIFICATIONS MESSAGE -->
-                    <div class="empty_image" v-if="notificationsData.notificationsList.length == 0">
-                      <img src="../../assets/media/empty_messages/snooze.png" alt="Empty Notifications" width="120"
-                        height="120" />
-                    </div>
-                    <!-- END:: EMPTY NOTIFICATIONS MESSAGE -->
-
-                    <ul class="notifications_menu" v-else>
-                      <!-- START:: SINGLE NOTIFICATION -->
-                      <li class="notifications_menu_item" v-for="item in notificationsData.notificationsList"
-                        :key="item.id">
-                        <!-- START:: NOTIFICATION BODY -->
-                        <div class="notification_body_wrapper" @click="
-                          redirectNotification(item.notify_type);
-                        readSingleNotification(item.id);
-                        ">
-                          <p class="notification_title">
-                            {{ item.title }}
-                          </p>
-                          <p class="notification_body">
-                            {{ item.body }}
-                          </p>
-                          <p class="notification_date">
-                            {{ item.created_at }}
-                          </p>
-                        </div>
-                        <!-- END:: NOTIFICATION BODY -->
-
-                        <!-- START:: DELETE NOTIFICATION BUTTON -->
-                        <div class="delete_btn_wrapper">
-                          <button class="delete_notification_btn" @click.stop="
-                            deleteNotification({
-                              id: item.id,
-                              notificationType: 'notifications_menu',
-                            })
-                            ">
-                            <i class="fal fa-trash-alt"></i>
-                          </button>
-                        </div>
-                        <!-- END:: DELETE NOTIFICATION BUTTON -->
-                      </li>
-                      <!-- END:: SINGLE NOTIFICATION -->
-                    </ul>
-
-                    <router-link class="all_notifications_route" to="/all-notifications">
-                      {{ $t("BUTTONS.allNotification") }}
-                    </router-link>
-                  </div>
-                  <!-- END:: NOTIFICATIONS LIST -->
-                </transition>
-              </div>
-              <!-- ********** End:: Notification Button ********** -->
 
               <!-- ********** Start:: Small Screens Navbar Drawer Button ********** -->
               <button class="small_screens_navbar_toggeler" @click="$emit('fireToggleNavDrawerEmit')">
@@ -204,6 +135,8 @@ export default {
 
   data() {
     return {
+      receivedMessages: [],
+      notificationCount: 0,
       // Start:: Notifications Menu Control Data
       notificationsMenuIsOpen: false,
       // End:: Notifications Menu Control Data
@@ -219,16 +152,16 @@ export default {
     ...mapActions({
       changeAppTheme: "AppThemeModule/changeAppTheme",
       changeAppLanguage: "AppLangModule/changeAppLanguage",
-      getNotifications: "NotificationsModule/getNotifications",
-      deleteNotification: "NotificationsModule/deleteNotification",
-      readSingleNotification: "NotificationsModule/readSingleNotification",
+      readAllNotifications: "NotificationsModule/readAllNotifications",
     }),
     // End:: Vuex Actions
 
     // Start:: Toggle Notifications Menu
     toggleNotificationsMenu() {
-      this.notificationsMenuIsOpen = !this.notificationsMenuIsOpen;
-      this.chatsDrawerIsOpen = false;
+      // this.notificationsMenuIsOpen = !this.notificationsMenuIsOpen;
+      // this.chatsDrawerIsOpen = false;
+      this.$router.push("/all-notifications/show");
+
     },
     // End:: Toggle Notifications Menu
 
@@ -247,11 +180,32 @@ export default {
       }
     },
     // End:: Notification Redirect
+
+    async getData() {
+      try {
+        let res = await this.$axios({
+          method: "GET",
+          url: "notification/user-notifications"
+        });
+        // console.log("All Data ==>", res.data.data);
+        this.notificationCount = res.data.data.filter((item) => item.is_read == false).length;
+      } catch (error) {
+        this.loading = false;
+        console.log(error.response.data.message);
+      }
+    },
   },
 
   created() {
+
+    // this.getData();
+    this.readAllNotifications();
+
+    navigator.serviceWorker.addEventListener('message', event => {
+      this.notificationCount++;
+    });
+
     // Start:: Fire Methods
-    this.getNotifications();
     window.addEventListener("click", () => {
       this.notificationsMenuIsOpen = false;
     });

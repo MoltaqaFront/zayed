@@ -90,12 +90,12 @@ export default {
         // console.log( "DATA TO EDIT =>", res.data.data.region );
 
         // Start:: Set Data
-        this.data.image.path = res.data.data.Admin.user.image;
-        this.data.name = res.data.data.Admin.user.name;
-        this.data.email = res.data.data.Admin.user.email;
-        this.data.phone = res.data.data.Admin.user.mobile;
-        this.data.role = res.data.data.Admin.user.roles[0].name;
-        this.data.active = res.data.data.Admin.user.is_active;
+        this.data.image.path = res.data.data.Admin.image;
+        this.data.name = res.data.data.Admin.name;
+        this.data.email = res.data.data.Admin.email;
+        this.data.phone = res.data.data.Admin.mobile;
+        this.data.role = res.data.data.Admin.roles[0].name;
+        this.data.active = res.data.data.Admin.is_active;
         // End:: Set Data
       } catch (error) {
         console.log(error.response.data.message);

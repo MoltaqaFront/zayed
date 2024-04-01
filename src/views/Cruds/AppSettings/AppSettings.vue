@@ -21,11 +21,11 @@
           <base-input col="6" type="number" :placeholder="$t('PLACEHOLDERS.ad_deletion_duration_per_day')"
             v-model="data.ad_deletion_duration_per_day" />
 
-          <base-input col="6" row="4" cols="4" type="textarea"
+          <base-text-editor col="6"   
             :placeholder="$t('PLACEHOLDERS.reservation_confirmation_message_ar')"
             v-model="data.reservation_confirmation_message_ar" />
 
-          <base-input col="6" row="4" cols="4" type="textarea"
+          <base-text-editor col="6"  
             :placeholder="$t('PLACEHOLDERS.reservation_confirmation_message_en')"
             v-model="data.reservation_confirmation_message_en" />
 
@@ -45,7 +45,9 @@
 <script>
 
 import { mapGetters, mapActions } from "vuex";
+import BaseTextEditor from '../../../components/formInputs/BaseTextEditor.vue';
 export default {
+	components: { BaseTextEditor },
   name: "GeneralSettings",
 
   data() {
@@ -134,7 +136,44 @@ export default {
 
     // Start:: validate Form Inputs
     validateFormInputs() {
-      this.submitForm();
+      this.isWaitingRequest = true;
+      if (!this.data.app_commission_in_riyals || this.data.app_commission_in_riyals === 'null') {
+        this.isWaitingRequest = false;
+        this.$message.error(this.$t("VALIDATION.commission_in_riyals_required"));
+      }
+      else if (this.data.app_commission_in_riyals < 1 || this.data.app_commission_in_riyals > 3) {
+        this.isWaitingRequest = false;
+        this.$message.error(this.$t("VALIDATION.commission_in_riyals"));
+      }
+    
+      else if (!this.data.ad_deletion_duration_per_hour || this.data.ad_deletion_duration_per_hour === 'null') {
+        this.isWaitingRequest = false;
+        this.$message.error(this.$t("VALIDATION.duration_per_hour_required"));
+      }
+      else if (this.data.ad_deletion_duration_per_hour < 1 || this.data.ad_deletion_duration_per_hour > 3) {
+        this.isWaitingRequest = false;
+        this.$message.error(this.$t("VALIDATION.duration_per_hour"));
+      }
+      else if (!this.data.ad_deletion_duration_per_day || this.data.ad_deletion_duration_per_day === 'null') {
+        this.isWaitingRequest = false;
+        this.$message.error(this.$t("VALIDATION.notfieldday"));
+      }
+      else if (this.data.ad_deletion_duration_per_day < 1 || this.data.ad_deletion_duration_per_day > 3) {
+        this.isWaitingRequest = false;
+        this.$message.error(this.$t("VALIDATION.daycondition"));
+      }
+       else if (this.data.reservation_confirmation_message_ar.length  < 10 || this.data.reservation_confirmation_message_ar.length  > 300) {
+        this.isWaitingRequest = false;
+        this.$message.error(this.$t("VALIDATION.confirmation_message_ar"));
+      }
+       else if (this.data.reservation_confirmation_message_en.length  < 10 || this.data.reservation_confirmation_message_en.length  > 300) {
+        this.isWaitingRequest = false;
+        this.$message.error(this.$t("VALIDATION.confirmation_message_ar"));
+      }
+       else {
+         this.submitForm();
+         return;
+      }
     },
     // End:: validate Form Inputs
   },
@@ -156,7 +195,7 @@ export default {
 
 .add_another {
   border: none;
-  padding: 8px;
+  padding: 10px;
   width: 40px;
   height: 40px;
   border: 1px solid var(--light_gray_clr);

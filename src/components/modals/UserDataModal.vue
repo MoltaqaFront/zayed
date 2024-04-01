@@ -147,10 +147,10 @@ export default {
         // console.log( "DATA TO EDIT =>", res.data.data.region );
 
         // Start:: Set Data
-        this.data.image.path = res.data.data.user.image;
-        this.data.name = res.data.data.user.name;
-        this.data.email = res.data.data.user.email;
-        this.data.phone = res.data.data.user.mobile;
+        this.data.image.path = res.data.data.image;
+        this.data.name = res.data.data.name;
+        this.data.email = res.data.data.email;
+        this.data.phone = res.data.data.mobile;
         // End:: Set Data
       } catch (error) {
         console.log(error.response.data.message);
@@ -159,15 +159,8 @@ export default {
     // End:: Get Data To Edit
 
     // Start:: validate Form Inputs
-    validateFormInputs() {
+   validateFormInputs() {
       this.isWaitingRequest = true;
-
-      // if (!this.data.image.path) {
-      //   this.isWaitingRequest = false;
-      //   this.$message.error(this.$t("VALIDATION.image"));
-      //   return;
-      // } else 
-
       // Basic email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       this.isValidEmail = emailRegex.test(this.data.email);
@@ -185,11 +178,11 @@ export default {
         this.$message.error(this.$t("VALIDATION.email_domain"));
         return;
       }
-      // else if (this.data.email.indexOf('@') === -1) {
-      //   this.isWaitingRequest = false;
-      //   this.$message.error(this.$t("VALIDATION.missingAtSymbol"));
-      //   return;
-      // }
+      else if (this.data.email.indexOf('@') === -1) {
+        this.isWaitingRequest = false;
+        this.$message.error(this.$t("VALIDATION.missingAtSymbol"));
+        return;
+      }
       else if (this.data.enableEditPassword) {
         if (!this.data.password) {
           this.isWaitingRequest = false;
@@ -238,7 +231,7 @@ export default {
         REQUEST_DATA.append("password", this.data.password);
         REQUEST_DATA.append("password_confirmation", this.data.passwordConfirmation);
       }
-      REQUEST_DATA.append("_method", "PUT");
+      // REQUEST_DATA.append("_method", "PUT");
       // Start:: Append Request Data
 
       try {
@@ -251,7 +244,7 @@ export default {
         this.isWaitingRequest = false;
         this.$message.success(this.$t("MESSAGES.editedSuccessfully"));
         this.setAuthenticatedUserData({
-          name: res.data.data.user.name,
+          name: res.data.data.name,
         });
         this.toggleModal();
       } catch (error) {

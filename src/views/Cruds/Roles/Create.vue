@@ -13,14 +13,29 @@
 
           <div class="col-md-6 col-12">
             <!-- Start:: Name Input -->
-            <base-input cols="6" type="text" :placeholder="$t('PLACEHOLDERS.nameAr')" v-model.trim="data.name_ar" required
-              @input="removeArabicCharacters" />
+            <base-input 
+              cols="6" 
+              type="text" 
+              :placeholder="$t('PLACEHOLDERS.nameAr')" 
+              v-model.trim="data.name_ar" 
+              @input="validateInput" 
+              @copy="onCopy" 
+              @paste="onPaste"
+              required/>
             <!-- End:: Name Input -->
           </div>
 
           <div class="col-md-6 col-12">
             <!-- Start:: Name Input -->
-            <base-input cols="6" type="text" :placeholder="$t('PLACEHOLDERS.nameEn')" v-model.trim="data.name_en" />
+            <base-input 
+              cols="6" 
+              type="text" 
+              :placeholder="$t('PLACEHOLDERS.nameEn')" 
+              v-model.trim="data.name_en" 
+              @input="removeArabicCharacters" 
+              @copy="onCopy" 
+              @paste="onPaste"
+              required/>
             <!-- End:: Name Input -->
           </div>
 
@@ -53,6 +68,21 @@
           </div>
           <!-- End:: Permissions -->
 
+           <!-- Start:: Deactivate Switch Input -->
+          <div class="input_wrapper switch_wrapper my-5">
+            <v-switch
+              color="green"
+              :label="
+                data.active
+                  ? $t('PLACEHOLDERS.active')
+                  : $t('PLACEHOLDERS.notActive')
+              "
+              v-model="data.active"
+              hide-details
+            ></v-switch>
+          </div>
+          <!-- End:: Deactivate Switch Input -->
+
           <!-- Start:: Submit Button Wrapper -->
           <div class="btn_wrapper">
             <base-button class="mt-2" styleType="primary_btn" :btnText="$t('BUTTONS.save')" :isLoading="isWaitingRequest"
@@ -82,6 +112,7 @@ export default {
       data: {
         name_ar: null,
         name_en: null,
+        active: null,
         permissions: [],
       },
 
@@ -100,8 +131,20 @@ export default {
 
   methods: {
 
+    onCopy(event) {
+      event.preventDefault();
+    },
+    onPaste(event) {
+      event.preventDefault();
+    },
+
+    validateInput() {
+      // Remove non-Arabic characters from the input
+      this.data.name_ar = this.data.name_ar.replace(/[^\u0600-\u06FF\s]/g, "");
+    },
+
     removeArabicCharacters() {
-      this.data.name = this.data.name.replace(this.EnRegex, "");
+      this.data.name_en = this.data.name_en.replace(this.EnRegex, "");
     },
     // Start:: Vuex Actions
     ...mapActions({
